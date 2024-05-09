@@ -20,7 +20,7 @@ const GEOMETRIES_LAYER = 'GeometriesLayer'
 
 export type Geometry = {
   Id: string
-  GeoJson: string
+  GeoJson: any
 }
 
 export default defineComponent({
@@ -34,8 +34,19 @@ export default defineComponent({
     this.id = Math.random().toString(36)
     console.log('VMap: created a map with id ' + this.id)
   },
-  mounted() {
-    this.load()
+  async mounted() {
+    this.map = new Map({
+        controls: [],
+        layers: [await this.wmtsBackgroundLayer(), await this.geometryLayer()],
+        target: this.id,
+        view: new View({
+          minZoom: 0,
+          maxZoom: 15,
+          projection: this.projection(),
+          center: [150000, 450000],
+          zoom: 3
+        })
+      })
   },
   data() {
     return {
@@ -65,20 +76,6 @@ export default defineComponent({
     }
   },
   methods: {
-    load: async function () {
-      this.map = new Map({
-        controls: [],
-        layers: [await this.wmtsBackgroundLayer(), await this.geometryLayer()],
-        target: this.id,
-        view: new View({
-          minZoom: 0,
-          maxZoom: 15,
-          projection: this.projection(),
-          center: [150000, 450000],
-          zoom: 3
-        })
-      })
-    },
     projection: function () {
       return new Projection({
         code: 'EPSG:28992',
@@ -133,12 +130,10 @@ export default defineComponent({
           layer: 'standaard',
           matrixSet: 'EPSG:28992',
           format: 'image/jpg',
-          // projection: this.projection(),
           tileGrid: new WMTSTileGrid({
             origin: getTopLeft(this.projectionExtent()),
             resolutions: [
-              3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72, 3.36,
-              1.68, 0.84, 0.42, 0.21
+              3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72, 3.36, 1.68, 0.84, 0.42, 0.21
             ],
             matrixIds: matrixIds
           }),

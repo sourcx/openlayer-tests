@@ -11,8 +11,8 @@ import HelloWorld from './components/HelloWorld.vue'
       <HelloWorld msg="Vue3 + OpenLayers" />
 
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/">EPSG:28992</RouterLink>
+        <RouterLink to="/epsg4326">EPSG:4326</RouterLink>
       </nav>
     </div>
   </header>

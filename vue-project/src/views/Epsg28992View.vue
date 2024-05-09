@@ -1,18 +1,18 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { Geometry } from '../components/TheMap.vue'
-import TheMap from '../components/TheMap.vue'
+import type { Geometry } from '../components/TheMapEpsg28992.vue'
+import TheMapEpsg28992 from '../components/TheMapEpsg28992.vue'
 
 export default defineComponent({
   components: {
-    TheMap
+    TheMapEpsg28992
   },
   data() {
     return {
       geometries: [
         {
           Id: '1',
-          GeoJson: JSON.stringify({
+          GeoJson: {
             type: 'FeatureCollection',
             features: [
               {
@@ -21,18 +21,18 @@ export default defineComponent({
                   type: 'Polygon',
                   coordinates: [
                     [
-                      [109000, 468500.00000000745],
+                      [109000, 468500],
                       [109000, 438000],
                       [170000, 438000],
-                      [170000, 468500.00000000745],
-                      [109000, 468500.00000000745]
+                      [170000, 468500],
+                      [109000, 468500]
                     ]
                   ]
                 },
                 properties: {}
               }
             ]
-          })
+          }
         }
       ] as Array<Geometry>
     }
@@ -42,7 +42,12 @@ export default defineComponent({
 
 <template>
   <main>
-    <TheMap :geometries="geometries" />
+    <TheMapEpsg28992 :geometries="geometries" />
+    Polygon:
+    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][0] }}
+    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][1] }}
+    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][2] }}
+    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][3] }}
   </main>
 </template>
 
