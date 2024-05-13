@@ -44,7 +44,7 @@ export default defineComponent({
           maxZoom: 15,
           projection: this.projection(),
           center: [150000, 450000],
-          zoom: 3
+          zoom: 2
         })
       })
   },

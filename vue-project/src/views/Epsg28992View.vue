@@ -2,6 +2,8 @@
 import { defineComponent } from 'vue'
 import type { Geometry } from '../components/TheMapEpsg28992.vue'
 import TheMapEpsg28992 from '../components/TheMapEpsg28992.vue'
+import nederland from '../assets/nederland-EPSG28992.json'
+import rectangle from '../assets/rectangle-EPSG28992.json'
 
 export default defineComponent({
   components: {
@@ -9,33 +11,21 @@ export default defineComponent({
   },
   data() {
     return {
+      nederland,
       geometries: [
         {
           Id: '1',
-          GeoJson: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Polygon',
-                  coordinates: [
-                    [
-                      [109000, 468500],
-                      [109000, 438000],
-                      [170000, 438000],
-                      [170000, 468500],
-                      [109000, 468500]
-                    ]
-                  ]
-                },
-                properties: {}
-              }
-            ]
-          }
-        }
+          GeoJson: rectangle,
+        },
+        {
+          Id: '2',
+          GeoJson: nederland,
+        },
       ] as Array<Geometry>
     }
+  },
+  mounted() {
+    // console.log(this.geometries)
   }
 })
 </script>
@@ -43,11 +33,9 @@ export default defineComponent({
 <template>
   <main>
     <TheMapEpsg28992 :geometries="geometries" />
-    Polygon:
-    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][0] }}
-    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][1] }}
-    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][2] }}
-    {{ geometries[0].GeoJson['features'][0]['geometry']['coordinates'][0][3] }}
+    Showing
+    <a href="#">Netherlands</a> polygon and
+    <a href="#">square</a> polygon.
   </main>
 </template>
 
