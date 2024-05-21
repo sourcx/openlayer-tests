@@ -13,6 +13,10 @@ import type { FlatStyleLike } from 'ol/style/flat'
 import { defineComponent } from 'vue'
 import TileWMS from 'ol/source/TileWMS'
 import { ScaleLine, defaults as defaultControls } from 'ol/control';
+import { OSM, WMTS } from 'ol/source'
+import WMTSTileGrid from 'ol/tilegrid/WMTS'
+import { getTopLeft, getWidth } from 'ol/extent'
+import { get } from 'ol/proj'
 
 const GEOMETRIES_LAYER = 'GeometriesLayer'
 
@@ -34,23 +38,10 @@ export default defineComponent({
   },
   async mounted() {
     this.map = new Map({
-      controls: defaultControls().extend([
-        new ScaleLine({
-          units: 'degrees',
-        }),
-      ]), target: this.id,
-      layers: [
-        new TileLayer({
-          source: new TileWMS({
-            url: 'https://ahocevar.com/geoserver/wms',
-            params: {
-              'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
-              'TILED': true,
-            },
-          }),
-        }),
-        await this.geometryLayer(),
-      ],
+      controls: [],
+      layers: [await this.osmBackgroundLayer(), await this.geometryLayer()],
+      // layers: [await this.pdokBackgroundLayer(), await this.geometryLayer()],
+      target: this.id,
       view: new View({
         projection: 'EPSG:4326',
         center: [5.5, 52],
@@ -86,6 +77,56 @@ export default defineComponent({
     }
   },
   methods: {
+    pdokBackgroundLayer: async function() {
+      // const projection = get('EPSG:4326')
+      const projection = get('EPSG:3857')
+      const projectionExtent = projection.getExtent()
+      const size = getWidth(projectionExtent) / 256
+      const resolutions = new Array(20)
+      const matrixIds = new Array(20)
+
+      for (let z = 0; z < 20; ++z) {
+        // generate resolutions and matrixIds arrays for this WMTS
+        // see https://openlayers.org/en/latest/examples/wmts.html
+        resolutions[z] = size / Math.pow(2, z)
+        matrixIds[z] = z
+      }
+
+      return new TileLayer({
+        extent: projectionExtent,
+        source: new WMTS({
+          // url: 'https://geodata.nationaalgeoregister.nl/tiles/service/wmts',
+          url: 'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0?',
+          layer: 'standaard',
+          // matrixSet: 'EPSG:4326',
+          matrixSet: 'EPSG:3857',
+          format: 'image/jpeg',
+          attributions: 'Map data: <a href="http://www.kadaster.nl">Kadaster</a>',
+          tileGrid: new WMTSTileGrid({
+            origin: getTopLeft(projectionExtent),
+            resolutions: resolutions,
+            matrixIds: matrixIds
+          }),
+          style: 'default'
+        })
+      })
+    },
+    osmBackgroundLayer: async function() {
+      return  new TileLayer({
+        source: new OSM(),
+      })
+    },
+    ahocevarBackgroundLayer: async function() {
+      return new TileLayer({
+        source: new TileWMS({
+          url: 'https://ahocevar.com/geoserver/wms',
+          params: {
+            'LAYERS': 'ne:NE1_HR_LC_SR_W_DR',
+            'TILED': true,
+          },
+        }),
+      })
+    },
     geometryLayer: async function () {
       const features = this.geometries.map((x) => new GeoJSON().readFeatures(x.GeoJson)[0])
       console.log('Add ' + features.length + ' geometries to the GeometriesLayer on the map.')
