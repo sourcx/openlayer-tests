@@ -4,6 +4,7 @@ import type { Geometry } from '../components/TheMapEpsg4326.vue'
 import TheMapEpsg4326 from '../components/TheMapEpsg4326.vue'
 import nederland from '../assets/nederland-EPSG4326.json'
 import rectangle from '../assets/rectangle-EPSG4326.json'
+import point from '../assets/point-EPSG4326.json'
 
 export default defineComponent({
   components: {
@@ -22,6 +23,10 @@ export default defineComponent({
           Id: '2',
           GeoJson: nederland,
         },
+        {
+          Id: '3',
+          GeoJson: point,
+        }
       ] as Array<Geometry>
     }
   },

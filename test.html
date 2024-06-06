@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>OpenLayers Point Feature Example</title>
+  <link rel="stylesheet" href="https://openlayers.org/en/v6.5.0/css/ol.css" type="text/css">
+  <style>
+    .map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map" class="map"></div>
+  <script src="https://openlayers.org/en/v6.5.0/build/ol.js"></script>
+  <script>
+    // Create a map
+    var map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        })
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([0, 0]), // Center map on coordinate [0, 0]
+        zoom: 2
+      })
+    });
+
+    // Define a point feature
+    var pointFeature = new ol.Feature({
+      geometry: new ol.geom.Point([0, 0]) // Point at coordinate [0, 0]
+    });
+
+    // Define a vector source to hold the point feature
+    var vectorSource = new ol.source.Vector({
+      features: [pointFeature]
+    });
+
+    // Define a vector layer to display the vector source
+    var vectorLayer = new ol.layer.Vector({
+      source: vectorSource
+    });
+
+    // Add the vector layer to the map
+    map.addLayer(vectorLayer);
+  </script>
+</body>
+
+</html>

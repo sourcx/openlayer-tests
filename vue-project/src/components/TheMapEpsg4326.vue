@@ -12,11 +12,7 @@ import Style from 'ol/style/Style'
 import type { FlatStyleLike } from 'ol/style/flat'
 import { defineComponent } from 'vue'
 import TileWMS from 'ol/source/TileWMS'
-import { ScaleLine, defaults as defaultControls } from 'ol/control';
-import { OSM, WMTS } from 'ol/source'
-import WMTSTileGrid from 'ol/tilegrid/WMTS'
-import { getTopLeft, getWidth } from 'ol/extent'
-import { get } from 'ol/proj'
+import { OSM } from 'ol/source'
 
 const GEOMETRIES_LAYER = 'GeometriesLayer'
 
@@ -40,7 +36,6 @@ export default defineComponent({
     this.map = new Map({
       controls: [],
       layers: [await this.osmBackgroundLayer(), await this.geometryLayer()],
-      // layers: [await this.pdokBackgroundLayer(), await this.geometryLayer()],
       target: this.id,
       view: new View({
         projection: 'EPSG:4326',
@@ -56,17 +51,17 @@ export default defineComponent({
       style: new Style({
         stroke: new Stroke({
           color: 'rgba(52, 73, 94, 1)', // vue gray
-          // color: 'rgba(0, 189, 126, 1)', // vue green
           lineDash: [4],
           width: 2
         }),
         fill: new Fill({
-          // color: 'rgba(52, 73, 94, 0.3)', // vue gray
           color: 'rgba(0, 189, 126, 0.1)' // vue green
         }),
         image: new CircleStyle({
-          radius: 2,
-          fill: new Fill({ color: 'rgba(52, 73, 94, 1)' })
+          radius: 5,
+          fill: new Fill({
+            color: 'rgba(0, 0, 0, 0.8)'
+          }),
         })
       }) as FlatStyleLike
     }
@@ -77,40 +72,6 @@ export default defineComponent({
     }
   },
   methods: {
-    pdokBackgroundLayer: async function() {
-      // const projection = get('EPSG:4326')
-      const projection = get('EPSG:3857')
-      const projectionExtent = projection.getExtent()
-      const size = getWidth(projectionExtent) / 256
-      const resolutions = new Array(20)
-      const matrixIds = new Array(20)
-
-      for (let z = 0; z < 20; ++z) {
-        // generate resolutions and matrixIds arrays for this WMTS
-        // see https://openlayers.org/en/latest/examples/wmts.html
-        resolutions[z] = size / Math.pow(2, z)
-        matrixIds[z] = z
-      }
-
-      return new TileLayer({
-        extent: projectionExtent,
-        source: new WMTS({
-          // url: 'https://geodata.nationaalgeoregister.nl/tiles/service/wmts',
-          url: 'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0?',
-          layer: 'standaard',
-          // matrixSet: 'EPSG:4326',
-          matrixSet: 'EPSG:3857',
-          format: 'image/jpeg',
-          attributions: 'Map data: <a href="http://www.kadaster.nl">Kadaster</a>',
-          tileGrid: new WMTSTileGrid({
-            origin: getTopLeft(projectionExtent),
-            resolutions: resolutions,
-            matrixIds: matrixIds
-          }),
-          style: 'default'
-        })
-      })
-    },
     osmBackgroundLayer: async function() {
       return  new TileLayer({
         source: new OSM(),
